@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/knapsack.dir/solution_nw_w.cpp.o  -o knapsack 
