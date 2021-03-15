@@ -1,3 +1,0 @@
-/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles/knapsack.dir
