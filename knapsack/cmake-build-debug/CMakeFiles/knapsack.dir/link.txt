@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/knapsack.dir/solution_nw_w.cpp.o  -o knapsack 
+/usr/bin/c++  -g   CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o  -o knapsack 

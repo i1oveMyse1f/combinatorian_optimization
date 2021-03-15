@@ -3,4 +3,4 @@ project(knapsack)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(knapsack solution_nw_w.cpp)
+add_executable(knapsack solution_n2DivEps_nDivEps.cpp)

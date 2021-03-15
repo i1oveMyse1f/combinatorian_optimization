@@ -57,27 +57,27 @@ include CMakeFiles/knapsack.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/knapsack.dir/flags.make
 
-CMakeFiles/knapsack.dir/solution_nw_w.cpp.o: CMakeFiles/knapsack.dir/flags.make
-CMakeFiles/knapsack.dir/solution_nw_w.cpp.o: ../solution_nw_w.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/knapsack.dir/solution_nw_w.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/knapsack.dir/solution_nw_w.cpp.o -c /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_nw_w.cpp
+CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o: CMakeFiles/knapsack.dir/flags.make
+CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o: ../solution_n2DivEps_nDivEps.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o -c /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_n2DivEps_nDivEps.cpp
 
-CMakeFiles/knapsack.dir/solution_nw_w.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/knapsack.dir/solution_nw_w.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_nw_w.cpp > CMakeFiles/knapsack.dir/solution_nw_w.cpp.i
+CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_n2DivEps_nDivEps.cpp > CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.i
 
-CMakeFiles/knapsack.dir/solution_nw_w.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/knapsack.dir/solution_nw_w.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_nw_w.cpp -o CMakeFiles/knapsack.dir/solution_nw_w.cpp.s
+CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_n2DivEps_nDivEps.cpp -o CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.s
 
 # Object files for target knapsack
 knapsack_OBJECTS = \
-"CMakeFiles/knapsack.dir/solution_nw_w.cpp.o"
+"CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o"
 
 # External object files for target knapsack
 knapsack_EXTERNAL_OBJECTS =
 
-knapsack: CMakeFiles/knapsack.dir/solution_nw_w.cpp.o
+knapsack: CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o
 knapsack: CMakeFiles/knapsack.dir/build.make
 knapsack: CMakeFiles/knapsack.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable knapsack"

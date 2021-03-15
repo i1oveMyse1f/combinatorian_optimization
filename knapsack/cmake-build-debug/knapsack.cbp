@@ -82,7 +82,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_nw_w.cpp">
+		<Unit filename="/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_n2DivEps_nDivEps.cpp">
 			<Option target="knapsack"/>
 		</Unit>
 		<Unit filename="/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/CMakeLists.txt">

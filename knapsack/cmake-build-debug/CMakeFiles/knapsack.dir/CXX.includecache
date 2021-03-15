@@ -6,11 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/main.cpp
+/mnt/c/Users/sapoz/YDSA/combinatorian_optimization/knapsack/solution_n2DivEps_nDivEps.cpp
 algorithm
 -
 iostream
 -
+numeric
+-
 vector
+-
+fstream
 -
 

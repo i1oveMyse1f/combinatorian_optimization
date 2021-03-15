@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/knapsack.dir/solution_nw_w.cpp.o"
+  "CMakeFiles/knapsack.dir/solution_n2DivEps_nDivEps.cpp.o"
   "knapsack"
   "knapsack.pdb"
 )
