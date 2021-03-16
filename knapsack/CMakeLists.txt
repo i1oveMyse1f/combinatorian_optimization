@@ -3,4 +3,4 @@ project(knapsack)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(knapsack src/solution_slow_ibarra.cpp)
+add_executable(knapsack src/solution_ibarra.cpp)

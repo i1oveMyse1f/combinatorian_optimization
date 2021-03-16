@@ -5,15 +5,19 @@
 
 using namespace std;
 
-vector<int> solve_knapsack(const vector<int>& c, const vector<int>& w, int max_w) {
+#define int long long
+
+const int INF = 1e18;
+
+vector<int> solve_knapsack(const vector<int>& c, const vector<int>& w, int max_c) {
     int n = c.size();
 
-    vector<int> dp(max_w + 1, -1);
+    vector<int> dp(max_c + 1, INF);
     dp[0] = 0;
     for (int i = 0; i < n; ++i) {
-        for (int j = max_w; j >= 0; --j) {
-            if (j >= w[i] && dp[j - w[i]] != -1) {
-                dp[j] = max(dp[j], dp[j - w[i]] + c[i]);
+        for (int j = max_c; j >= c[i]; --j) {
+            if (dp[j - c[i]] != INF) {
+                dp[j] = min(dp[j], dp[j - c[i]] + w[i]);
             }
         }
     }
@@ -34,13 +38,13 @@ vector<int> recover_answer(const vector<int>& c, const vector<int>& w, int c_opt
     auto c_left = vector<int>(c.begin(), c.begin() + m), c_right = vector<int>(c.begin() + m, c.end());
     auto w_left = vector<int>(w.begin(), w.begin() + m), w_right = vector<int>(w.begin() + m, w.end());
 
-    auto opt_left = solve_knapsack(c_left, w_left, w_opt);
-    auto opt_right = solve_knapsack(c_right, w_right, w_opt);
+    auto opt_left = solve_knapsack(c_left, w_left, c_opt);
+    auto opt_right = solve_knapsack(c_right, w_right, c_opt);
 
-    for (int i = 0; i <= w_opt; ++i) {
-        if (opt_left[i] + opt_right[w_opt - i] == c_opt) {
-            auto recover_left = recover_answer(c_left, w_left, opt_left[i], i);
-            auto recover_right = recover_answer(c_right, w_right, opt_right[w_opt - i], w_opt - i);
+    for (int i = 0; i <= c_opt; ++i) {
+        if (opt_left[i] != INF && opt_right[c_opt - i] != INF && opt_left[i] + opt_right[c_opt - i] == w_opt) {
+            auto recover_left = recover_answer(c_left, w_left, i, opt_left[i]);
+            auto recover_right = recover_answer(c_right, w_right, c_opt - i, opt_right[c_opt - i]);
             for (int& id : recover_right) {
                 id += m;
             }
@@ -49,7 +53,7 @@ vector<int> recover_answer(const vector<int>& c, const vector<int>& w, int c_opt
         }
     }
 
-    throw 1;
+    exit(1);
 }
 
 pair<int, vector<int>> get_half_approximation(const vector<int>& c, const vector<int>& w, int max_w) {
@@ -59,83 +63,101 @@ pair<int, vector<int>> get_half_approximation(const vector<int>& c, const vector
     sort(id.begin(), id.end(), [&c, &w](int i, int j){
         return c[i] * w[j] > c[j] * w[i];
     });
-    int c_approx = 0;
-    int w_approx = 0;
+    int c_approx = 0, w_approx = 0;
     int i = 0;
-    for (; i < n && w_approx + w[i] <= max_w; ++i) {
-        w_approx += w[i];
-        c_approx += c[i];
+    for (; i < n && w_approx + w[id[i]] <= max_w; ++i) {
+        w_approx += w[id[i]];
+        c_approx += c[id[i]];
     }
     if (i < n) {
-        c_approx = max(c_approx, c[i]);
+        c_approx = max(c_approx, c[id[i]]);
     }
     return { c_approx, vector<int>(id.begin(), id.begin() + i) };
 }
 
-pair<int, vector<int>> get_slow_eps_approximation(const vector<int>& c, const vector<int>& w, int max_w, double eps) {
-    eps /= 2;
-    int n = c.size();
-
-    auto [c_half_approx, things_half_approx] = get_half_approximation(c, w, max_w);
-    if (eps >= 0.5) {
-        return {c_half_approx, things_half_approx};
+int calc_cost(const vector<int>& c, const vector<int>& things) {
+    int cost = 0;
+    for (int id : things) {
+        cost += c[id];
     }
-
-    int c_max = 2 * c_half_approx;
-    vector<int> c_scaled = c;
-    for (int& x : c_scaled) {
-        x = (x * 1. * n) / (c_max * eps);
-    }
-
-    auto dp = solve_knapsack(c, w, max_w);
-    int w_opt = max_element(dp.begin(), dp.end()) - dp.begin();
-    auto things = recover_answer(c, w, dp[w_opt], w_opt);
-    return { dp[w_opt], things };
+    return cost;
 }
 
 pair<int, vector<int>> get_eps_approximation(const vector<int>& c, const vector<int>& w, int max_w, double eps) {
-    eps /= 6;
     int n = c.size();
 
-    auto [c_half_approx, things_half_approx] = get_half_approximation(c, w, max_w);
+    auto [_, things_half_approx] = get_half_approximation(c, w, max_w);
+    int c_half_approx = calc_cost(c, things_half_approx);
     if (eps >= 0.5) {
-        return {c_half_approx, things_half_approx};
+        return { c_half_approx, things_half_approx };
     }
 
+    eps /= 3;
+
+    int max_opt_c = 1.0 / eps / eps;
+    int max_small_c = 1.0 / eps;
     int c_max = 2 * c_half_approx;
     vector<int> c_scaled = c;
-
     for (int& x : c_scaled) {
-        x = x / (c_max * eps * eps);
+        x = (double)x / c_max * max_opt_c;
     }
 
-    vector<int> c_small_things, w_small_things, c_large_things, w_large_things;
-
+    vector<int> c_small, c_large, w_small, w_large, id_small, id_large;
     for (int i = 0; i < n; ++i) {
-        if (c[i] < 1/eps)
+        if (c_scaled[i] < max_small_c) {
+            c_small.push_back(c_scaled[i]);
+            w_small.push_back(w[i]);
+            id_small.push_back(i);
+        } else {
+            c_large.push_back(c_scaled[i]);
+            w_large.push_back(w[i]);
+            id_large.push_back(i);
+        }
     }
 
-    auto dp = solve_knapsack(c, w, max_w);
-    int w_opt = max_element(dp.begin(), dp.end()) - dp.begin();
-    auto things = recover_answer(c, w, dp[w_opt], w_opt);
-    return { dp[w_opt], things };
+    auto dp = solve_knapsack(c_large, w_large, max_opt_c);
+    int c_max_ans_scaled = 0, max_ans_scaled = -1;
+    vector<int> ans_small_things;
+    for (int i = 0; i <= max_opt_c; ++i) {
+        if (dp[i] != INF && dp[i] <= max_w) {
+            auto [half_approx_small, cur_scaled_small_things] = get_half_approximation(c_small, w_small, max_w - dp[i]);
+            if (max_ans_scaled < half_approx_small + i) {
+                c_max_ans_scaled = i;
+                max_ans_scaled = half_approx_small + i;
+                ans_small_things = cur_scaled_small_things;
+            }
+        }
+    }
+
+    auto ans_large_things = recover_answer(c_large, w_large, c_max_ans_scaled, dp[c_max_ans_scaled]);
+    vector<int> things;
+    things.reserve(id_small.size() + id_large.size());
+    for (int id : ans_small_things) {
+        things.push_back(id_small[id]);
+    }
+    for (int id : ans_large_things) {
+        things.push_back(id_large[id]);
+    }
+
+    int c_opt = calc_cost(c, things);
+    return { c_opt, things };
 }
 
-
-int main() {
+signed main() {
+    freopen("data/3.public", "r", stdin);
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
     int n, max_w;
     cin >> n >> max_w;
-    cout << n;
+
     vector<int> c(n), w(n);
     for (int i = 0; i < n; ++i) {
         cin >> c[i] >> w[i];
     }
 
-    auto [c_opt, things] = get_eps_approximation(c, w, max_w, 0.1);
+    auto [c_opt, things] = get_eps_approximation(c, w, max_w, 0.03);
 
     cout << c_opt << '\n';
     for (int id : things) {
