@@ -6,22 +6,8 @@
 
 FullyKnapsackAnswer Knapsack::solve_recover_approximation_half(long long max_w) {
     int n = size();
-    if (sorted_id.empty()) {
-        sorted_id.resize(n);
-        iota(sorted_id.begin(), sorted_id.end(), 0);
-        sort(sorted_id.begin(), sorted_id.end(), [this](int i, int j) {
-            return c[i] * w[j] > c[j] * w[i];
-        });
-    }
-
-    if (pref_w.empty()) {
-        pref_w.resize(n);
-        pref_c.resize(n);
-        for (int i = 0; i < n; ++i) {
-            pref_w[i] = (i == 0 ? 0 : pref_w[i - 1]) + w[sorted_id[i]];
-            pref_c[i] = (i == 0 ? 0 : pref_c[i - 1]) + c[sorted_id[i]];
-        }
-    }
+    init_sorted_id();
+    init_pref();
 
     int approx_l = 0;
     int approx_r = upper_bound(pref_w.begin(), pref_w.end(), max_w) - pref_w.begin();
@@ -35,7 +21,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_half(long long max_w) 
         approx_r = approx_r + 1;
     }
 
-    vector<long long> things = vector<long long>(sorted_id.begin() + approx_l, sorted_id.begin() + approx_r);
+    auto things = vector<int>(sorted_id.begin() + approx_l, sorted_id.begin() + approx_r);
 
     for (int i = 0; i < approx_l; ++i) {
         if (w_approx + w[i] <= max_w) {
@@ -67,8 +53,8 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_slow(long long max_w, 
 
     auto max_opt_c = static_cast<long long>(static_cast<double>(n) / eps);
     long long c_max = 2 * c_half_approx;
-    vector<long long> c_scaled = c;
-    for (long long& x : c_scaled) {
+    auto c_scaled = c;
+    for (auto& x : c_scaled) {
         x = static_cast<long long>(static_cast<double>(x) / static_cast<double>(c_max) * static_cast<double>(max_opt_c));
     }
 
@@ -85,7 +71,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_slow(long long max_w, 
     exit(1);
 }
 
-vector<long long> recover_things_dpc(const Knapsack& k, long long c_opt, long long w_opt) {
+vector<int> recover_things_dpc(const Knapsack& k, long long c_opt, long long w_opt) {
     int n = k.size();
     if (n == 0 || w_opt == 0) {
         return {};
@@ -96,8 +82,8 @@ vector<long long> recover_things_dpc(const Knapsack& k, long long c_opt, long lo
 
     long long m = n / 2;
 
-    Knapsack left(vector<long long>(k.c.begin(), k.c.begin() + m), vector<long long>(k.w.begin(), k.w.begin() + m));
-    Knapsack right(vector<long long>(k.c.begin() + m, k.c.end()), vector<long long>(k.w.begin() + m, k.w.end()));
+    Knapsack left(vector<int>(k.c.begin(), k.c.begin() + m), vector<int>(k.w.begin(), k.w.begin() + m));
+    Knapsack right(vector<int>(k.c.begin() + m, k.c.end()), vector<int>(k.w.begin() + m, k.w.end()));
 
     auto opt_left = left.solve_dpc(c_opt);
     auto opt_right = right.solve_dpc(c_opt);
@@ -106,7 +92,7 @@ vector<long long> recover_things_dpc(const Knapsack& k, long long c_opt, long lo
         if (opt_left[i] != INF && opt_right[c_opt - i] != INF && opt_left[i] + opt_right[c_opt - i] == w_opt) {
             auto recover_left = recover_things_dpc(left, i, opt_left[i]);
             auto recover_right = recover_things_dpc(right, c_opt - i, opt_right[c_opt - i]);
-            for (long long& id : recover_right) {
+            for (auto& id : recover_right) {
                 id += m;
             }
             recover_left.insert(recover_left.end(), recover_right.begin(), recover_right.end());
@@ -116,7 +102,7 @@ vector<long long> recover_things_dpc(const Knapsack& k, long long c_opt, long lo
     exit(1);
 }
 
-vector<long long> recover_things_dpw(const Knapsack& k, long long c_opt, long long w_opt) {
+vector<int> recover_things_dpw(const Knapsack& k, long long c_opt, long long w_opt) {
     int n = k.size();
     if (n == 0 || w_opt == 0) {
         return {};
@@ -127,8 +113,8 @@ vector<long long> recover_things_dpw(const Knapsack& k, long long c_opt, long lo
 
     long long m = n / 2;
 
-    Knapsack left(vector<long long>(k.c.begin(), k.c.begin() + m), vector<long long>(k.w.begin(), k.w.begin() + m));
-    Knapsack right(vector<long long>(k.c.begin() + m, k.c.end()), vector<long long>(k.w.begin() + m, k.w.end()));
+    Knapsack left(vector<int>(k.c.begin(), k.c.begin() + m), vector<int>(k.w.begin(), k.w.begin() + m));
+    Knapsack right(vector<int>(k.c.begin() + m, k.c.end()), vector<int>(k.w.begin() + m, k.w.end()));
 
     auto opt_left = left.solve_dpw(w_opt);
     auto opt_right = right.solve_dpw(w_opt);
@@ -137,7 +123,7 @@ vector<long long> recover_things_dpw(const Knapsack& k, long long c_opt, long lo
         if (opt_left[i] + opt_right[w_opt - i] == c_opt) {
             auto recover_left = recover_things_dpw(left, opt_left[i], i);
             auto recover_right = recover_things_dpw(right, opt_right[w_opt - i], w_opt - i);
-            for (long long& id : recover_right) {
+            for (auto& id : recover_right) {
                 id += m;
             }
             recover_left.insert(recover_left.end(), recover_right.begin(), recover_right.end());
@@ -200,13 +186,13 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_ibarra(long long max_w
     long long max_opt_c = 1.0 / eps / eps;
     long long max_small_c = 1.0 / eps;
     long long c_max = 2 * c_half_approx;
-    vector<long long> c_scaled = c;
-    for (long long& x : c_scaled) {
+    auto c_scaled = c;
+    for (auto& x : c_scaled) {
         x = (double)x / c_max * max_opt_c;
     }
 
-    vector<long long> c_small, c_large, w_small, w_large, id_small, id_large;
-    for (long long i = 0; i < n; ++i) {
+    vector<int> c_small, c_large, w_small, w_large, id_small, id_large;
+    for (int i = 0; i < n; ++i) {
         if (c_scaled[i] < max_small_c) {
             c_small.push_back(c_scaled[i]);
             w_small.push_back(w[i]);
@@ -222,7 +208,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_ibarra(long long max_w
 
     auto dp = large.solve_dpc(max_opt_c);
     long long max_left_scaled = 0, max_total_scaled = -1;
-    vector<long long> ans_small_things;
+    vector<int> ans_small_things;
     for (long long i = 0; i <= max_opt_c; ++i) {
         if (dp[i] != INF && dp[i] <= max_w) {
             auto [c_half_approx_small, w_half_approx_small, cur_small_things] =
@@ -236,12 +222,12 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_ibarra(long long max_w
     }
 
     auto ans_large_things = recover_things_dpc(large, max_left_scaled, dp[max_left_scaled]);
-    vector<long long> things;
+    vector<int> things;
     things.reserve(id_small.size() + id_large.size());
-    for (long long id : ans_small_things) {
+    for (auto id : ans_small_things) {
         things.push_back(id_small[id]);
     }
-    for (long long id : ans_large_things) {
+    for (auto id : ans_large_things) {
         things.push_back(id_large[id]);
     }
 
@@ -250,7 +236,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_ibarra(long long max_w
     return { c_opt, w_opt, things };
 }
 
-long long Knapsack::calc_weight(const vector<long long>& things) const {
+long long Knapsack::calc_weight(const vector<int>& things) const {
     long long weight = 0;
     for (long long id : things) {
         weight += w[id];
@@ -258,7 +244,7 @@ long long Knapsack::calc_weight(const vector<long long>& things) const {
     return weight;
 }
 
-long long Knapsack::calc_cost(const vector<long long>& things) const {
+long long Knapsack::calc_cost(const vector<int>& things) const {
     long long cost = 0;
     for (long long id : things) {
         cost += c[id];
@@ -278,7 +264,7 @@ void rec(Knapsack& k, int i, int min_opt, int max_w, FullyKnapsackAnswer& cur, F
         return;
     }
 
-    Knapsack next_k(vector<long long>(k.c.begin() + 1, k.c.end()), vector<long long>(k.w.begin() + 1, k.w.end()));
+    Knapsack next_k(vector<int>(k.c.begin() + 1, k.c.end()), vector<int>(k.w.begin() + 1, k.w.end()));
 
     auto [c_skip_approx, w_skip, things_skip] = next_k.solve_recover_approximation_half(max_w);
     if (k.w[0] > max_w) {
@@ -331,7 +317,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_branch_bound(long long max_w) {
         return c[i] > c[j];
     });
 
-    vector<long long> nc(n), nw(n);
+    vector<int> nc(n), nw(n);
     for (int i = 0; i < n; ++i) {
         nc[i] = c[sorted[i]];
         nw[i] = w[sorted[i]];
@@ -348,77 +334,6 @@ FullyKnapsackAnswer Knapsack::solve_recover_branch_bound(long long max_w) {
     return ans;
 }
 
-FullyKnapsackAnswer Knapsack::solve_recover_branch_bound_bullshit(long long max_w, int kL, int kR) {
-    int n = size();
-    if (sorted_id.empty()) {
-        sorted_id.resize(n);
-        iota(sorted_id.begin(), sorted_id.end(), 0);
-        sort(sorted_id.begin(), sorted_id.end(), [this](long long i, long long j) {
-            return c[i] * w[j] > c[j] * w[i];
-        });
-    };
-
-    if (pref_w.empty()) {
-        pref_w.resize(n);
-        pref_c.resize(n);
-        for (int i = 0; i < n; ++i) {
-            pref_w[i] = (i == 0 ? 0 : pref_w[i - 1]) + w[sorted_id[i]];
-            pref_c[i] = (i == 0 ? 0 : pref_c[i - 1]) + c[sorted_id[i]];
-        }
-    }
-
-    int approx_l = 0;
-    int approx_r = upper_bound(pref_w.begin(), pref_w.end(), max_w) - pref_w.begin();
-    long long c_approx = approx_r == 0 ? 0 : pref_c[approx_r - 1];
-    long long w_approx = approx_r == 0 ? 0 : pref_w[approx_r - 1];
-
-    if (approx_r < n && c_approx < c[sorted_id[approx_r]] && w[sorted_id[approx_r]] <= max_w) {
-        c_approx = c[sorted_id[approx_r]];
-        w_approx = w[sorted_id[approx_r]];
-        approx_l = approx_r;
-        approx_r = approx_r + 1;
-    }
-
-    int branchbound_l = max<long long>(0, approx_r - kL);
-    int branchbound_r = min<long long>(n, approx_r + kR);
-
-    vector<long long> branchbound_w(branchbound_r - branchbound_l), branchbound_c(branchbound_r - branchbound_l);
-    for (int i = branchbound_l; i < branchbound_r; ++i) {
-        branchbound_c[i - branchbound_l] = c[sorted_id[i]];
-        branchbound_w[i - branchbound_l] = w[sorted_id[i]];
-    }
-
-    Knapsack bk(branchbound_c, branchbound_w);
-    auto [bk_c, bk_w, bk_thing] = bk.solve_recover_branch_bound(max_w - (branchbound_l == 0 ? 0 : pref_w[branchbound_l - 1]));
-    for (auto& id : bk_thing) {
-        id = sorted_id[branchbound_l + id];
-    }
-
-    long long total_c = (branchbound_l == 0 ? 0 : pref_c[branchbound_l - 1]) + bk_c;
-    long long total_w = (branchbound_l == 0 ? 0 : pref_w[branchbound_l - 1]) + bk_w;
-
-    vector<long long> things = vector<long long>(sorted_id.begin() + min<long long>(approx_l, branchbound_l), sorted_id.begin() + branchbound_l);
-    things.insert(things.end(), bk_thing.begin(), bk_thing.end());
-
-
-    for (int i = 0; i < min(branchbound_l, approx_l); ++i) {
-        if (total_w + w[sorted_id[i]] <= max_w) {
-            total_w += w[sorted_id[i]];
-            total_c += c[sorted_id[i]];
-            things.push_back(sorted_id[i]);
-        }
-    }
-
-    for (int i = max(branchbound_r, approx_r); i < n; ++i) {
-        if (total_w + w[sorted_id[i]] <= max_w) {
-            total_w += w[sorted_id[i]];
-            total_c += c[sorted_id[i]];
-            things.push_back(sorted_id[i]);
-        }
-    }
-
-    return { total_c, total_w, things };
-}
 
 FullyKnapsackAnswer Knapsack::solve_recover_meet_in_the_middle(long long max_w) {
     int n = size();
@@ -487,7 +402,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_meet_in_the_middle(long long max_w) 
         }
     }
 
-    vector<long long> things;
+    vector<int> things;
     for (int i = 0; i < m; ++i) {
         if ((mask_best_left >> i) & 1) {
             things.push_back(i);
@@ -502,17 +417,20 @@ FullyKnapsackAnswer Knapsack::solve_recover_meet_in_the_middle(long long max_w) 
     return { c_best, w_best, things};
 }
 
-FullyKnapsackAnswer Knapsack::solve_recover_meet_in_the_middle_bullshit(long long max_w, int kL, int kR) {
-    int n = size();
+void Knapsack::init_sorted_id() {
     if (sorted_id.empty()) {
+        int n = size();
         sorted_id.resize(n);
         iota(sorted_id.begin(), sorted_id.end(), 0);
         sort(sorted_id.begin(), sorted_id.end(), [this](long long i, long long j) {
-            return c[i] * w[j] > c[j] * w[i];
+            return c[i] * 1LL * w[j] > c[j] * 1LL * w[i];
         });
     };
+}
 
+void Knapsack::init_pref() {
     if (pref_w.empty()) {
+        int n = size();
         pref_w.resize(n);
         pref_c.resize(n);
         for (int i = 0; i < n; ++i) {
@@ -520,55 +438,4 @@ FullyKnapsackAnswer Knapsack::solve_recover_meet_in_the_middle_bullshit(long lon
             pref_c[i] = (i == 0 ? 0 : pref_c[i - 1]) + c[sorted_id[i]];
         }
     }
-
-    int approx_l = 0;
-    int approx_r = upper_bound(pref_w.begin(), pref_w.end(), max_w) - pref_w.begin();
-    long long c_approx = approx_r == 0 ? 0 : pref_c[approx_r - 1];
-    long long w_approx = approx_r == 0 ? 0 : pref_w[approx_r - 1];
-
-    if (approx_r < n && c_approx < c[sorted_id[approx_r]] && w[sorted_id[approx_r]] <= max_w) {
-        c_approx = c[sorted_id[approx_r]];
-        w_approx = w[sorted_id[approx_r]];
-        approx_l = approx_r;
-        approx_r = approx_r + 1;
-    }
-
-    int branchbound_l = max<long long>(0, approx_r - kL);
-    int branchbound_r = min<long long>(n, approx_r + kR);
-
-    vector<long long> branchbound_w(branchbound_r - branchbound_l), branchbound_c(branchbound_r - branchbound_l);
-    for (int i = branchbound_l; i < branchbound_r; ++i) {
-        branchbound_c[i - branchbound_l] = c[sorted_id[i]];
-        branchbound_w[i - branchbound_l] = w[sorted_id[i]];
-    }
-
-    Knapsack bk(branchbound_c, branchbound_w);
-    auto [bk_c, bk_w, bk_thing] = bk.solve_recover_meet_in_the_middle(max_w - (branchbound_l == 0 ? 0 : pref_w[branchbound_l - 1]));
-    for (auto& id : bk_thing) {
-        id = sorted_id[branchbound_l + id];
-    }
-
-    long long total_c = (branchbound_l == 0 ? 0 : pref_c[branchbound_l - 1]) + bk_c;
-    long long total_w = (branchbound_l == 0 ? 0 : pref_w[branchbound_l - 1]) + bk_w;
-
-    vector<long long> things = vector<long long>(sorted_id.begin() + min<long long>(approx_l, branchbound_l), sorted_id.begin() + branchbound_l);
-    things.insert(things.end(), bk_thing.begin(), bk_thing.end());
-
-    for (int i = 0; i < min(branchbound_l, approx_l); ++i) {
-        if (total_w + w[sorted_id[i]] <= max_w) {
-            total_w += w[sorted_id[i]];
-            total_c += c[sorted_id[i]];
-            things.push_back(sorted_id[i]);
-        }
-    }
-
-    for (int i = max(branchbound_r, approx_r); i < n; ++i) {
-        if (total_w + w[sorted_id[i]] <= max_w) {
-            total_w += w[sorted_id[i]];
-            total_c += c[sorted_id[i]];
-            things.push_back(sorted_id[i]);
-        }
-    }
-
-    return { total_c, total_w, things };
 }
