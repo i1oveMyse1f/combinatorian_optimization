@@ -8,8 +8,8 @@ using namespace std;
 const long long INF = 1e9;
 
 struct FullyKnapsackAnswer {
-    long long c_opt;
-    long long w_opt;
+    long long c_opt = 0;
+    long long w_opt = 0;
     vector<long long> things;
 };
 
@@ -31,11 +31,20 @@ public:
 
     [[nodiscard]] long long calc_weight(const vector<long long>& things) const;
     [[nodiscard]] long long calc_cost(const vector<long long>& things) const;
-    [[nodiscard]] long long size() const;
+    [[nodiscard]] int size() const;
+
+    FullyKnapsackAnswer solve_recover_branch_bound(long long max_w);
+    FullyKnapsackAnswer solve_recover_branch_bound_bullshit(long long max_w, int kL, int kR);
+
+    FullyKnapsackAnswer solve_recover_meet_in_the_middle(long long max_w);
+    FullyKnapsackAnswer solve_recover_meet_in_the_middle_bullshit(long long max_w, int kL, int kR);
+
+    friend void rec(Knapsack& k, int i, int min_opt, int max_w, FullyKnapsackAnswer& cur, FullyKnapsackAnswer& ans);
 
 private:
     vector<long long> c, w;
-    vector<long long> pref_w, pref_c, sorted_id;
+    vector<long long> pref_w, pref_c;
+    vector<int> sorted_id;
 };
 
 #endif //KNAPSACK_KNAPSACK_H
