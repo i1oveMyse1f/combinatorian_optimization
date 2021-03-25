@@ -24,17 +24,17 @@ FullyKnapsackAnswer Knapsack::solve_recover_approximation_half(long long max_w) 
     auto things = vector<int>(sorted_id.begin() + approx_l, sorted_id.begin() + approx_r);
 
     for (int i = 0; i < approx_l; ++i) {
-        if (w_approx + w[i] <= max_w) {
-            w_approx += w[i];
-            c_approx += c[i];
+        if (w_approx + w[sorted_id[i]] <= max_w) {
+            w_approx += w[sorted_id[i]];
+            c_approx += c[sorted_id[i]];
             things.push_back(sorted_id[i]);
         }
     }
 
     for (int i = approx_r; i < n; ++i) {
-        if (w_approx + w[i] <= max_w) {
-            w_approx += w[i];
-            c_approx += c[i];
+        if (w_approx + w[sorted_id[i]] <= max_w) {
+            w_approx += w[sorted_id[i]];
+            c_approx += c[sorted_id[i]];
             things.push_back(sorted_id[i]);
         }
     }
@@ -313,7 +313,7 @@ FullyKnapsackAnswer Knapsack::solve_recover_branch_bound(long long max_w) {
 
     vector<int> sorted(n);
     iota(sorted.begin(), sorted.end(), 0);
-    sort(sorted.begin(), sorted.end(), [this](long long i, long long j) {
+    sort(sorted.begin(), sorted.end(), [this](int i, int j) {
         return c[i] > c[j];
     });
 
