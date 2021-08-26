@@ -1,0 +1,4 @@
+/.idea
+/cmake-build-debug
+tex/*
+!tex/report.pdf
